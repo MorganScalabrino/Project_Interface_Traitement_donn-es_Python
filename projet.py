@@ -26,7 +26,7 @@ else:
 ##Fonctions :
 #Fonction créeant un dataframe à partir du fichier d'annotation du génome spécifié:
 def recup_data(genome):
-     """
+    """
     Description :
     ------------
         Fonction récupérant le dataframe du fichier d'annotation à du génome donnée en argument.
