@@ -1,0 +1,10 @@
+def blastp (proteine,sequence,genome,my_os_type):
+    fh = sequence_principale.fasta.NamedTemporaryFile()
+    file_im = open("data_correc/gene_imaginaire.fasta","w")
+    SeqIO.write(seq_im, file_im,"fasta")
+    list_os = ["linux","win","macosx"]
+    l_cmdos=["Blast+/linux/bin/blastp","- Blast+/macosx/bin/blastp","Blast+/win/bin/blastp.exe"]
+    cmdos=l_cmdos[list_os.index(mys_os_type)]
+    cmd_line=cmdos+"-query"+genome+".fasta"+"-db"+genome2+"/"+genome2.phr+"-evalue 0.001 -out result_blast.xml -outfmt 5"
+    subprocess.run(cmd_line)
+    file_im.close()
