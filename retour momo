@@ -1,1 +1,3 @@
-
+fh = open("sequence_principale.fasta","w")
+SeqIO.write(sequence, fh,"fasta")
+fh.close()
