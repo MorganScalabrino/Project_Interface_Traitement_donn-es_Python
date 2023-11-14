@@ -1,6 +1,7 @@
 import sys
 import os
 import pandas as pd
+from Bio import SeqIO
 
 ##Notre dossier de travail est celui juste avant le dossier data.
 
@@ -19,17 +20,52 @@ else:
     if my_os_type not in list_os :
         sys.exit("Fournir un os correct : linux, win ou macosx")
 
+
 ###PARTIE 1:
 
 ##Fonctions :
-#Fonction récupérant les informations sur la protéine du génome spécifié:
+#Fonction créeant un dataframe à partir du fichier d'annotation du génome spécifié:
+def recup_data(genome):
+     """
+    Description :
+    ------------
+        Fonction récupérant le dataframe du fichier d'annotation à du génome donnée en argument.
 
+    Arguments :
+    -----------
+        genome : string
+
+    Returns :
+    ---------
+        Retourne le dataframe correspondant.
+
+    """
+    ##On récupére en dataframe le fichier tsv.
+    dataframe = pd.read_csv(f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t')
+    dataframe.index += 1
+    return dataframe
+
+
+#Fonction récupérant les informations sur la protéine du génome spécifié:
 def recup_info_prot(genome,proteine):
-    "Fonction récupérant les informations sur une protéine dans le génome spécifié. Premier argument : génome; deuxième argument : protéine"
+    """
+    Description :
+    ------------
+        Fonction récupérant les informations associée à la protéine et au génome rentrés en argument.
+
+    Arguments :
+    -----------
+        genome : string , le génome d'intérêt.
+        proteine : string , la protéine d'intérêt.
+
+    Returns :
+    ---------
+        Retourne un dataframe correspondant à la ligne de la protéine du fichier d'annotation.
+    """
     ##La gestion d'erreur sert si on exécute le code dans le mauvais dossier de travail ou que le dossier contenant le génome n'existe pas.
     try:
         ##On récupére en dataframe le fichier tsv.
-        dataframe = pd.read_csv(f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t', index_col = 0)
+        dataframe = recup_data(genome)
         ##Si la protéine qu'on a demandé n'est pas dans le génome on break le script, sinon on récupère en dictionaire les infos sur la protéine. A OPTIMISER
         if proteine in set(dataframe["Protein_Id"]):
             list_prot_info = dataframe[dataframe["Protein_Id"] == proteine]
@@ -40,13 +76,24 @@ def recup_info_prot(genome,proteine):
     return list_prot_info
 
 #Fonction récupérant la liste des protéines dans le génome spécifié:
-
 def recup_prot(genome):
-    "Fonction récupérant la liste des protéines dans le génome spécifié. Premier argument : génome"
+    """
+    Description :
+    ------------
+        Fonction récupérant la liste des protéines disponibles dans le génome d'intérêt.
+        
+    Arguments :
+    -----------
+        genome : string , le génome d'intérêt.
+        
+    Returns :
+    ---------
+        Retourne une liste avec tous les id des protéines du génome d'intérêt.
+    """
     ##La gestion d'erreur sert si on exécute le code dans le mauvais dossier de travail ou que le dossier contenant le génome n'existe pas.
     try:
-         ##On récupére en dataframe le fichier tsv.
-        dataframe = pd.read_csv(f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t', index_col = 0)
+        ##On récupére en dataframe le fichier tsv.
+        dataframe = recup_data(genome)
         ##On crée une liste avec toutes les protéines.
         list_prot = list(dataframe.Protein_Id)
     except FileNotFoundError:
@@ -55,9 +102,20 @@ def recup_prot(genome):
 
 
 #Fonction récupérant une liste avec les 30 génomes:
-
 def recup_genome(file):
-    "Récupération des génomes du fichier rentré en argument."
+    """
+    Description :
+    ------------
+        Fonction récupérant la liste des 30 génomes par leur Assembly accesion.
+        
+    Arguments :
+    -----------
+        file : string , chemin d'accès au fichier, généralement "data/Ecoli_genomes_refseq.xlsx"
+
+    Returns :
+    ---------
+        Retourne une liste composée des 30 génomes de notre projet.
+    """
     ##La gestion d'erreur sert si on exécute le code dans le mauvais dossier de travail.
     try :
         ##On converit le fichier excell en argument en dataframe.
@@ -79,35 +137,44 @@ if genome in recup_genome("data/Ecoli_genomes_refseq.xlsx"):
 else:
     sys.exit("Attention, le génome demandé n'est pas dans les 30 génomes donnés.")
     
-#Affichage des demandes :
+#Vérification.
 #print("La liste des différentes protéines du génome est : ", liste_proteines)
-print("Les informations sur notre protéine d'intéret sont : ", list_proteine_info) 
+print("Les informations sur notre protéine d'intéret sont : ", list_proteine_info)
 
 
 ###PARTIE 2:
-from Bio import SeqIO
-
 #Si on arrive à cette partie c'est que la protéine existe bien dans le génome et qu'on a récupéré les informations dans dict_proteine_info.
 
 ##Fonctions:
 #Fonction qui récupère la séquence de la protéine du fichier fasta contenant les séquences de toutes les protéines du génome :
+def recup_seq(genome,protein):
+    """
+    Description :
+    ------------
+        Fonction récupérant l'objet seq_record associé à notre protéine.
+        
+    Arguments :
+    -----------
+        genome : string , le génome d'intérêt.
+        proteine : string , la protéine d'intérêt.
 
-def recup_seq(genome,proteine):
-    "Fonction récupérant la séquence de la protéine dans le génome spécifié. Premier argument : génome; Deuxième argument : protéine"
-    ##On récupère le fichier fasta contenant les séquences du génome donné.
-    fasta = SeqIO.parse(f'data/genomes/{genome}/protein.faa', "fasta")
-    #On récupère la séquence. A OPTIMISER
-    for i in fasta:
-        if i.id == proteine:
-            seq = i.seq
-    return seq
+    Returns :
+    ---------
+        Retourne un objet seq_record contenant la séquence de notre protéine d'intérêt et son identifiant.
 
+    """
+
+    for seq_record in SeqIO.parse(f'data/genomes/{genome}/protein.faa',"fasta"):
+        if seq_record.id == protein:
+            return(seq_record)
 
 ##Main:
+#On récupère la séquence de notre protéine d'intérêt dans notre génome d'intérêt.
+sequence = recup_seq(genome,proteine).seq
 
-sequence = recup_seq(genome,proteine)
-
+#Vérification.
 print("La séquence de la protéine d'intéret est : ", sequence)
+
 
 ###PARTIE 3: 
 
@@ -119,6 +186,73 @@ print("La séquence de la protéine d'intéret est : ", sequence)
 #On récupère les 29 autres génomes de la liste :
 list_genome_autre = recup_genome("data/Ecoli_genomes_refseq.xlsx")
 list_genome_autre.remove(genome)
+
+
+###PARTIE 4:
+
+##Fonctions:
+#Fonction cherchant la protéine en amont et en aval de la protéine donnée:
+
+def amont_aval(genome,proteine):
+    """
+    Description :
+    ------------
+        Fonction cherchant la protéine en amont et en aval de notre protéine d'intérêt dans notre génome d'intérêt.
+        
+    Arguments :
+    -----------
+        genome : string , le génome d'intérêt.
+        proteine : string , la protéine d'intérêt.
+
+    Returns :
+    ---------
+        Retourne une liste avec en premier la protéine en amont et en second la protéine en aval.
+    """
+    
+    #On récupére en dataframe le fichier tsv.
+    dataframe = recup_data(genome)
+
+    #On récupère la position dans le dataframe de notre protéine.
+    position_prot = dataframe[dataframe["Protein_Id"] == proteine].index[0]
+
+    #On fait une boucle pour gérer si la protéine est au début du génome ou à la fin (dans le tableau tsv).
+    if position_prot == 1:
+        print("Attention votre protéine est sur le premier gène du génome, comme il est circulaire ce n'est pas pénalisant")
+        prot1 = dataframe.loc[position_prot + 1]["Protein_Id"]
+        prot2 = dataframe.loc[dataframe.shape[0]]["Protein_Id"]
+    elif position_prot == dataframe.shape[0]:
+        print("Attention votre protéine est sur le dernier gène du génome, comme il est circulaire ce n'est pas pénalisant")
+        prot1 = dataframe.loc[1]["Protein_Id"]
+        prot2 = dataframe.loc[position_prot - 1]["Protein_Id"]
+    else:
+        prot1 = dataframe.loc[position_prot + 1]["Protein_Id"]
+        prot2 = dataframe.loc[position_prot - 1]["Protein_Id"]
+
+    #On gère le fait qu'un gène en brin + ou - n'a pas les mêmes définitions de aval et amont.
+    if list_proteine_info["Strand"][position_prot] == "+":
+        proteine_aval = prot1
+        proteine_amont = prot2
+    else:
+        proteine_aval = prot2
+        proteine_amont = prot1
+
+    return [proteine_amont, proteine_aval]
+
+##Main:
+
+#On définit la protéine en amont et en aval.
+proteine_amont = amont_aval(genome,proteine)[0]
+proteine_aval = amont_aval(genome,proteine)[1]
+
+#Vérification.
+print("La protéine en amont est", proteine_amont)
+print("La protéine en aval est", proteine_aval)
+
+
+###PARTIE 5
+
+
+
 
 
 
