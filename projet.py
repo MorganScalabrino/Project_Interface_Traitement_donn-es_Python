@@ -8,6 +8,16 @@ import pandas as pd
 var = sys.argv
 genome = var[1]
 proteine = var[2]
+my_os_type = var[3]
+
+#Vérification des arguments en entrée:
+list_os = ["linux","win","macosx"]
+
+if len(var) != 4:
+    sys.exit("Fournir le bon nombre d'arguments svp.")
+else:
+    if my_os_type not in list_os :
+        sys.exit("Fournir un os correct : linux, win ou macosx")
 
 ###PARTIE 1:
 
@@ -21,13 +31,13 @@ def recup_info_prot(genome,proteine):
         ##On récupére en dataframe le fichier tsv.
         dataframe = pd.read_csv(f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t', index_col = 0)
         ##Si la protéine qu'on a demandé n'est pas dans le génome on break le script, sinon on récupère en dictionaire les infos sur la protéine. A OPTIMISER
-        if proteine in set(dataframe.Protein_Id):
-            dict_prot = dataframe[dataframe.Protein_Id == proteine].to_dict()
+        if proteine in set(dataframe["Protein_Id"]):
+            list_prot_info = dataframe[dataframe["Protein_Id"] == proteine]
         else:
             sys.exit("La protéine n'est pas contenu dans le génome donné.")
     except FileNotFoundError:
         print("Rentrez un argument correct svp.")
-    return dict_prot
+    return list_prot_info
 
 #Fonction récupérant la liste des protéines dans le génome spécifié:
 
@@ -60,22 +70,18 @@ def recup_genome(file):
 
 ##Main:
 
-#Vérification du nombre d'arguments, c'est à dire 3:
-if len(var) != 4:
-    sys.exit("Fournir le bon nombre d'arguments svp.")
+##Si le nombre d'argument est bien de 2 et que le génome existe, 
+##alors on récupère les protéines présentes dans celui-ci et on
+##récupère les informations sur la protéine demandée.
+if genome in recup_genome("data/Ecoli_genomes_refseq.xlsx"):
+    liste_proteines = recup_prot(genome)
+    list_proteine_info = recup_info_prot(genome,proteine)
 else:
-    ##Si le nombre d'argument est bien de 2 et que le génome existe, 
-    ##alors on récupère les protéines présentes dans celui-ci et on
-    ##récupère les informations sur la protéine demandée.
-    if genome in recup_genome("data/Ecoli_genomes_refseq.xlsx"):
-        liste_proteines = recup_prot(genome)
-        dict_proteine_info = recup_info_prot(genome,proteine)
-    else:
-        sys.exit("Attention, le génome demandé n'est pas dans les 30 génomes donnés.")
+    sys.exit("Attention, le génome demandé n'est pas dans les 30 génomes donnés.")
     
 #Affichage des demandes :
 #print("La liste des différentes protéines du génome est : ", liste_proteines)
-print("Les informations sur notre protéine d'intéret sont : ", dict_proteine_info) 
+print("Les informations sur notre protéine d'intéret sont : ", list_proteine_info) 
 
 
 ###PARTIE 2:
@@ -103,7 +109,19 @@ sequence = recup_seq(genome,proteine)
 
 print("La séquence de la protéine d'intéret est : ", sequence)
 
-###PARTIE 3:
+###PARTIE 3: 
+
+##Fonctions:
+
+
+##Main:
+
+#On récupère les 29 autres génomes de la liste :
+list_genome_autre = recup_genome("data/Ecoli_genomes_refseq.xlsx")
+list_genome_autre.remove(genome)
+
+
+
 
 
 
