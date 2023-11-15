@@ -18,3 +18,15 @@ blastp(sequence,"GCF_001901045.1")
 prochain but formater le fichier xml
 from Bio.Blast import NCBIXML
 blast_record = NCBIXML.read(result_handle)
+
+
+OUT = open(sys.argv[4], 'w')
+OUT.write("Query Name\tQuery Length\tAlignment Title\tAlignment ID\tAlignment Def\teValue")
+from Bio.Blast import NCBIXML
+file=open("./result_blast.xml", "r")
+blast_record=NCBIXML.read(file)
+file.close()
+for rec in blast_records:
+    for alignement in rec.alignments:
+        for hsp in alignment.hsps:
+            OUT.write('\n'+ str(rec.query_id) + '\t' + str(rec.query_length) + '\t' + str(alignment.title) + '\t' + str(alignment.hit_id) + '\t' + str(alignment.hit_def) + '\t' + str(hsp.expect))
