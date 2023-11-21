@@ -326,7 +326,10 @@ if __name__ == '__main__':
     
     #Vérification.
     print("La protéine en amont est", proteine_amont)
+    print("Les informations sur la protéine en amont sont :", recup_info_prot(genome,proteine_amont))
+    
     print("La protéine en aval est", proteine_aval)
+    print("Les informations sur la protéine en amont sont :", recup_info_prot(genome,proteine_aval))
     
     #Pour la protéine en amont, même procédé qu'en partie 3:
     record_amont = recup_seq(genome,proteine_amont)
@@ -417,3 +420,8 @@ if __name__ == '__main__':
     #Pour connaître le temps à qu'a mis le script à run:
     difference = datetime.now() - start
     print("Le script s'est effectué en",difference)
+
+    #On rajoute le génome de référence et ses informations dans les 3 dictionnaires.
+    dict_proteine_info[genome] = list_prot_info
+    dict_proteine_amont_info[genome] = list_proteine_amont_info
+    dict_proteine_aval_info[genome] = list_proteine_aval_info
