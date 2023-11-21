@@ -7,9 +7,12 @@ from Bio import SeqIO
 import subprocess
 from Bio.Blast import NCBIXML
 import platform
+from pygenomeviz import GenomeViz #Nécessité d'installer pygenomeviz: pip install pygenomeviz
+from matplotlib.lines import Line2D
 
 ##Fonctions de notre module:
 
+#Fonctions partie 1 :
 #Fonction créeant un dataframe à partir du fichier d'annotation du génome spécifié:
 def recup_data(genome):
     """
@@ -86,7 +89,6 @@ def recup_prot(genome):
         print("Rentrez un argument correct svp.")
     return list_prot
 
-
 #Fonction récupérant une liste avec les 30 génomes:
 def recup_genome(file):
     """
@@ -112,6 +114,8 @@ def recup_genome(file):
         print("Rentrez un argument correct svp.")
     return genom
 
+#Fonction partie 2:
+
 #Fonction qui récupère la séquence de la protéine du fichier fasta contenant les séquences de toutes les protéines du génome :
 def recup_seq(genome,protein):
     """
@@ -133,7 +137,9 @@ def recup_seq(genome,protein):
     for seq_record in SeqIO.parse(f'data/genomes/{genome}/protein.faa',"fasta"):
         if seq_record.id == protein:
             return(seq_record)
-            
+
+#Fonctions partie 3 :
+
 #Fonction lançant un blastp pour la protéine sur le génome indiqué:
 def blastp(genome,record):
     """
@@ -203,6 +209,8 @@ def best_hit(file):
     #On renvoie le résultat qui est un objet blast.
     return result_hit
 
+#Fonctions partie 4 :
+
 #Fonction cherchant la protéine en amont et en aval de la protéine donnée:
 
 def amont_aval(genome,proteine):
@@ -249,6 +257,98 @@ def amont_aval(genome,proteine):
         proteine_amont = prot1
 
     return [proteine_amont, proteine_aval]
+
+#Fonctions partie 6:
+
+#Fonction associant -1 aux protéines sur le brin - et inversement.
+def strand_protein(genome,dict):
+    """
+    Description :
+    ------------
+       Fonction associant -1 aux protéines sur le brin - et inversement.
+        
+    Arguments :
+    -----------
+        genome : string , le génome d'intérêt.
+        dict : dictionary , dictionnaire regroupant pour chaque génome la protéine blastée associée.
+
+    Returns :
+    ---------
+        Retourne 1 si protéine sur le brin + et -1 si protéine sur le brin -.
+    """
+    if dict[genome].Strand.item() == "-":
+        return -1
+    else : 
+        return 1
+
+#Fonction affichant les 3 protéines avec leur sens sur le brin.
+def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
+    #Nom du brin, on donne le nom du génome.
+    name = genome
+
+    #Liste des positions des 3 protéines pour définir la taille de la visualisation.
+    list_position = []
+    
+    #On gère si jamais la protéine centrale, en amont ou en aval n'a pas été conservée sur le génome. Si elle n'est pas conservée on a une chaine de caractères comme value du dictionnaire.
+    if type(dict_amont[genome]) != str:
+        #Comme la protéine est présente on compte sa position dans la liste des positions
+        list_position += [dict_amont[genome].End.item(),dict_amont[genome].Begin.item()]
+        
+    if type(dict_aval[genome]) != str:
+        list_position += [dict_aval[genome].End.item(),dict_aval[genome].Begin.item()]
+        
+    if type(dict_centre[genome]) != str:
+        list_position += [dict_centre[genome].End.item(),dict_centre[genome].Begin.item()]
+
+    #Si la liste des positions est vide on a aucun des gènes sur le génome blasté.
+    if list_position == []:
+        return {"name" : f"Les trois gènes sont absents du génome {genome}", "size" : 0, "cds_list" : ((0,0,0),(0,0,0),(0,0,0))}
+
+    #Si on arrive ici alors la liste n'est pas nulle.
+    #La fin de la zone de visualisation est le maximum de la liste des positions (avec une marge de 500pb).
+    fin=max(list_position) + 500
+
+    #Le début de la zone de visualisation est le minimum de la liste des positions (avec une marge de 500pb).
+    debut=min(list_position) - 500
+
+    #Taille de la zone de visualisation.
+    taille = fin - debut 
+
+    #Si les protéines sont très éloignées alors l'affichage ne fonctionne pas.
+    if taille >= 100000:
+        return {"name" : f"La distance entre les gènes du génome {genome} est trop grande pour l'affichage", "size" : 0, "cds_list" : ((0,0,0),(0,0,0),(0,0,0))}
+
+    #On définit la taille de la protéine sur la zone de visualisation pour les 3 protéines.
+    
+    if type(dict_amont[genome]) == str:
+        a = (0,0,0)
+    else:
+        begin_cds_amont  = taille - (fin - dict_amont[genome].Begin.item())
+        end_cds_amont    = taille - (fin - dict_amont[genome].End.item())
+        signe_amont = strand_protein(genome, dict_amont)
+        a = (begin_cds_amont, end_cds_amont, signe_amont)
+    
+    if type(dict_aval[genome]) == str:
+        b = (0,0,0)
+    else:
+        begin_cds_aval   = taille - (fin - dict_aval[genome].Begin.item())
+        end_cds_aval     = taille - (fin - dict_aval[genome].End.item())
+        signe_aval  = strand_protein(genome, dict_aval)
+        b = (begin_cds_aval, end_cds_aval, signe_aval)
+    
+    if type(dict_centre[genome]) == str:
+        c = (0,0,0)
+    else:
+        begin_cds_centre = taille - (fin - dict_centre[genome].Begin.item())
+        end_cds_centre   = taille - (fin - dict_centre[genome].End.item())
+        signe_centre = strand_protein(genome, dict_centre)
+        c = (begin_cds_centre, end_cds_centre, signe_centre)
+    
+    cds_list = (a, b, c)
+    
+    #On retourne les informations de visualisation.
+    return {"name" : name, "size" : taille, "cds_list" : cds_list}
+
 
 #Mane de notre module:
 
@@ -316,7 +416,7 @@ if __name__ == '__main__':
     
     
     #Vérification :
-    print("Les résultats du blast sur notre protéine sont", dict_besthit_proteine)
+    #print("Les résultats du blast sur notre protéine sont", dict_besthit_proteine)
     
     print("Par exemple, la protéine, d'ID :", proteine ,"sur le génome de référence :",genome,"a un hit sur le génome:",list_genome_autre[5], "et l'id de cette protéine est alors",   dict_besthit_proteine[list_genome_autre[5]].hit_id,"dans ce génome.")
     
@@ -417,11 +517,37 @@ if __name__ == '__main__':
             
     print(dict_proteine_aval_info)
 
+    #On rajoute le génome de référence et ses informations dans les 3 dictionnaires.
+    dict_proteine_info[genome] = list_proteine_info
+    dict_proteine_amont_info[genome] = list_proteine_amont_info
+    dict_proteine_aval_info[genome] = list_proteine_aval_info
+
+    #On crée les infos de visualtisation pour chaque génome.
+    genome_visual=[]
+    for genome_id in dict_proteine_info.keys() :
+        genome_visual.append(info_affichage_genome(genome_id,dict_proteine_aval_info,dict_proteine_amont_info,dict_proteine_info))
+
+    #La légende du gène représenté.
+    legend = ["amont","aval","centre"]
+
+    #Couleur en fonction de la place du gène, pour observer l'ordre.
+    color = ["blue","red","green"]
+
+    #Echelle.
+    gv = GenomeViz(tick_style="axis")
+
+    #On place chaque gène sur le génome.
+    for elem in genome_visual:
+        name, size, cds_list = elem["name"], elem["size"], elem["cds_list"]
+        track = gv.add_feature_track(name, size)
+        for idx, cds in enumerate(cds_list, 1):
+            start, end, strand = cds
+            track.add_feature(start, end, strand, label=legend[idx-1], linewidth=1, labelrotation=0, labelvpos="top", labelhpos="center", labelha="center", facecolor=color[idx-1],labelsize=8)
+
+    #On save la visualisation de la synténie.
+    fig = gv.plotfig()
+    fig.savefig("synt.png")
+
     #Pour connaître le temps à qu'a mis le script à run:
     difference = datetime.now() - start
     print("Le script s'est effectué en",difference)
-
-    #On rajoute le génome de référence et ses informations dans les 3 dictionnaires.
-    dict_proteine_info[genome] = list_prot_info
-    dict_proteine_amont_info[genome] = list_proteine_amont_info
-    dict_proteine_aval_info[genome] = list_proteine_aval_info
