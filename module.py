@@ -9,6 +9,7 @@ from Bio.Blast import NCBIXML
 import platform
 from pygenomeviz import GenomeViz #Nécessité d'installer pygenomeviz: pip install pygenomeviz
 from matplotlib.lines import Line2D
+from datetime import datetime
 
 ##Fonctions de notre module:
 
@@ -355,7 +356,7 @@ def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
 if __name__ == '__main__':
     #Pour calculer le temps que met le script à s'exécuter:
     from datetime import datetime
-    start = datetime.now()
+    starttime = datetime.now()
 
     #Récupération des données (protéine et génome)
     var = sys.argv
@@ -473,8 +474,9 @@ if __name__ == '__main__':
     print("Par exemple, la protéine en aval, d'ID :", proteine_aval ,"sur le génome de référence :",genome,"a un hit sur le génome:",list_genome_autre[5], "et l'id de cette protéine est alors",   dict_besthit_proteine_aval[list_genome_autre[5]].hit_id,"dans ce génome.")
     
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine d'intérêt: 
-    
-    dict_proteine_info = {}
+
+    #On crée un dictionnaire avec comme première valeur le génome de référence.
+    dict_proteine_info = {genome : recup_info_prot(genome,proteine)}
     
     for i in dict_besthit_proteine:
         
@@ -489,7 +491,7 @@ if __name__ == '__main__':
 
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en amont de celle d'intérêt: 
     
-    dict_proteine_amont_info = {}
+    dict_proteine_amont_info = {genome : recup_info_prot(genome,proteine_aval)}
     
     for i in dict_besthit_proteine_amont:
         
@@ -504,7 +506,7 @@ if __name__ == '__main__':
 
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en aval de celle d'intérêt: 
     
-    dict_proteine_aval_info = {}
+    dict_proteine_aval_info = {genome : recup_info_prot(genome,proteine_amont)}
     
     for i in dict_besthit_proteine_aval:
 
@@ -516,11 +518,6 @@ if __name__ == '__main__':
             dict_proteine_aval_info[i] = "Pas de résultat"
             
     print(dict_proteine_aval_info)
-
-    #On rajoute le génome de référence et ses informations dans les 3 dictionnaires.
-    dict_proteine_info[genome] = list_proteine_info
-    dict_proteine_amont_info[genome] = list_proteine_amont_info
-    dict_proteine_aval_info[genome] = list_proteine_aval_info
 
     #On crée les infos de visualtisation pour chaque génome.
     genome_visual=[]
@@ -548,6 +545,8 @@ if __name__ == '__main__':
     fig = gv.plotfig()
     fig.savefig("synt.png")
 
+    display(fig)
+    
     #Pour connaître le temps à qu'a mis le script à run:
-    difference = datetime.now() - start
+    difference = datetime.now() - starttime
     print("Le script s'est effectué en",difference)
