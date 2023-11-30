@@ -12,10 +12,6 @@ from matplotlib.lines import Line2D
 from datetime import datetime
 from matplotlib.patches import Patch
 
-
-
-
-
 ##Fonctions de notre module:
 
 #Fonctions à adapter pour run le code
