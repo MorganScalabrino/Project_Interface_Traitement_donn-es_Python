@@ -320,7 +320,7 @@ def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
 
     #Si les protéines sont très éloignées alors nous n'avons pas trouvé de moyen de l'afficher, donc on dit que les protéines sont trop éloignées pour afficher.
     if taille >= 100000:
-        return {"name" : name, "size" : 1, "cds_list" : ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),""))}
+        return {"name" : name, "size" : taille, "cds_list" : ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),""))}
 
     #On définit la taille de la protéine sur la zone de visualisation pour les 3 protéines.
     
@@ -398,28 +398,28 @@ if __name__ == '__main__':
     else:
         sys.exit("Attention, le génome demandé n'est pas dans les 30 génomes donnés.")
 
-    print("--------------------Protéine intérêt informations---------------------")
+    print(f"\n--------------------Protéine intérêt informations---------------------")
     
-    print("Vous avez lancé une analyse de synténie sur la protéine", proteine, "sur le génome d'E. coli", genome)
+    print(f"\nVous avez lancé une analyse de synténie sur la protéine", proteine, "sur le génome d'E. coli", genome)
     
     #On récupère la séquence de notre protéine d'intérêt dans notre génome d'intérêt avec quelques informations.
     record = recup_seq(genome,proteine)
 
-    print("Les informations sur notre protéine d'intéret sont : ", \n list_proteine_info)
+    print(f"\nLes informations sur notre protéine d'intéret sont :\n", list_proteine_info)
 
-    print("La séquence de la protéine d'intéret est : ", record.seq)
+    print(f"\nLa séquence de la protéine d'intéret est : ", record.seq)
 
     #On définit la protéine en amont et en aval.
     proteine_amont = amont_aval(genome,proteine)[0]
     proteine_aval = amont_aval(genome,proteine)[1]
 
-    print("-------------------Protéine amont/aval informations---------------------")
+    print(f"\n-------------------Protéine amont/aval informations---------------------")
     
-    print("La protéine en amont est", proteine_amont)
-    print("Les informations sur la protéine en amont sont :", \n recup_info_prot(genome,proteine_amont))
+    print(f"\nLa protéine en amont est", proteine_amont)
+    print(f"\nLes informations sur la protéine en amont sont :\n", recup_info_prot(genome,proteine_amont))
     
-    print("La protéine en aval est", proteine_aval)
-    print("Les informations sur la protéine en amont sont :", \n recup_info_prot(genome,proteine_aval))
+    print(f"\nLa protéine en aval est", proteine_aval)
+    print(f"\nLes informations sur la protéine en amont sont :\n", recup_info_prot(genome,proteine_aval))
     
     #On récupère les 29 autres génomes de la liste :
     list_genome_autre = recup_genome("data/Ecoli_genomes_refseq.xlsx")
@@ -437,7 +437,7 @@ if __name__ == '__main__':
 
         dict_besthit_proteine[genom] = hit
 
-    print("Le blast pour la protéine d'intérêt vient de se terminer, nous lançons alors le blast pour ses protéines en amont et aval")
+    print(f"\n ⚠ Le blast pour la protéine d'intérêt vient de se terminer, nous lançons alors le blast pour ses protéines en amont et aval.")
     
     #Pour la protéine en amont, même procédé qu'en partie 3:
     record_amont = recup_seq(genome,proteine_amont)
@@ -469,15 +469,15 @@ if __name__ == '__main__':
 
         dict_besthit_proteine_aval[genom] = hit
 
-    print("Le blast pour les protéines en amont et en aval vient de se terminer nous passons à la visualisation de la synténie")
+    print(f"\n ⚠ Le blast pour les protéines en amont et en aval vient de se terminer nous passons à la visualisation de la synténie")
     
     #Pour connaître le temps à qu'a mis le script à run:
     difference = datetime.now() - starttime
-    print("Les blasts se sont effectués en",difference)
+    print(f"\nLes blasts se sont effectués en",difference)
 
-    print("------------------Visualisation de la synténie--------------------")
+    print(f"\n------------------Visualisation de la synténie--------------------")
 
-    print("Voici les résultats de la synténie dans les 30 génomes, une image est aussi accessible dans le dossier où vous avez lancer l'interface.")
+    print(f"\nLes résultats de la synténie dans les 30 génomes sont désormais visible ! Pour cela reportez vous à la partie visualisation, une image est aussi accessible dans le dossier où vous avez lancer l'interface.")
     
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine d'intérêt.
 
@@ -495,7 +495,7 @@ if __name__ == '__main__':
 
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en amont de celle d'intérêt: 
     
-    dict_proteine_amont_info = {genome : recup_info_prot(genome,proteine_aval)}
+    dict_proteine_amont_info = {genome : recup_info_prot(genome,proteine_amont)}
     
     for i in dict_besthit_proteine_amont:
         
@@ -508,7 +508,7 @@ if __name__ == '__main__':
 
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en aval de celle d'intérêt: 
     
-    dict_proteine_aval_info = {genome : recup_info_prot(genome,proteine_amont)}
+    dict_proteine_aval_info = {genome : recup_info_prot(genome,proteine_aval)}
     
     for i in dict_besthit_proteine_aval:
 
@@ -543,9 +543,9 @@ if __name__ == '__main__':
                 start, end, strand, position, protein_id = cds
                 if position != (0,0):
                     if name == genome:
-                        track.add_feature(200, 200, 1, label = "* Génome de référence *", labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 14)
-                    track.add_exon_feature([(start,end)], strand,exon_labels = [protein_id], labelrotation = 0, labelha = "center", exon_label_kws = {"y": 0, "va": "center", "color": "white"})
-                    track.add_feature(start, end, strand, label = "begin : " + str(position[0]) + "       " + " end : " + str(position[1]), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", facecolor = color[idx-1],labelsize = 10)
+                        track.add_feature(0, 0, 1, label = "* Génome de référence *", labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 8)
+                    track.add_exon_feature([(start,end)], strand,exon_labels = [protein_id], labelrotation = 0, labelha = "center", exon_label_kws = {"y": 0, "va": "center", "color": "black"},labelsize = 9)
+                    track.add_feature(start, end, strand, label = str(position[0]) + "             " + str(position[1]), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", facecolor = color[idx-1],labelsize = 10)
 
     #On gère l'affichage des légendes.
     
@@ -555,8 +555,8 @@ if __name__ == '__main__':
     #On gère l'affichage des légendes.
     handles = [
     Patch(color = "green", label = "Centre"),
-    Patch(color = "blue", label = "Aval"),
-    Patch(color = "red", label = "Amont"),
+    Patch(color = "blue", label = "Amont"),
+    Patch(color = "red", label = "Aval"),
     ]
     
     fig.legend(handles = handles, bbox_to_anchor = (1, 1))  
