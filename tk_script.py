@@ -17,7 +17,7 @@ import random as rd
 import os
 import sys
 from threading import Thread
-import module_propre
+import module
 import tkinter as tk
 from PIL import Image, ImageTk
  
@@ -85,7 +85,7 @@ class Appli(tk.Tk):
         ## Voici le truc, on pointe le sys.stdout vers le textbox
         sys.stdout = StdoutRedirector(self.textbox)
 
-        thread = Thread(target = module_propre.main(self.genome_use,self.protein_use,self.os_use))
+        thread = Thread(target = module.main(self.genome_use,self.protein_use,self.os_use))
         thread.start() # This code will execute in parallel to the current code
         thread.join()
  
