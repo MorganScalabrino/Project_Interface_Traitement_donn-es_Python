@@ -509,8 +509,8 @@ def main(genome,proteine,my_os_type):
     #On gère l'affichage des légendes.
     handles = [
     Patch(color = "green", label = "Centre"),
-    Patch(color = "blue", label = "Aval"),
-    Patch(color = "red", label = "Amont"),
+    Patch(color = "blue", label = "Amont"),
+    Patch(color = "red", label = "Aval"),
     ]
     
     fig.legend(handles = handles, bbox_to_anchor = (1, 1))  
