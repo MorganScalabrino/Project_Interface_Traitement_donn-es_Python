@@ -4,10 +4,6 @@ Created on Sun Nov 19 15:35:05 2023
 
 @author: user
 """
-#GCF_001566615.1
-#'WP_000241659.1'
-#https://www.plus2net.com/python/tkinter-colors.php
-
 import tkinter as tk
 from tkinter import ttk
 import random as rd
@@ -19,7 +15,6 @@ import tkinter as tk
 from PIL import Image
 
 
-#
 class StdoutRedirector(object):
     """
     Classe ajoutée pour pouvoir rediriger la sortie standard dans un widget de la fenêtre.
