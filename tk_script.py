@@ -42,17 +42,17 @@ class Appli(tk.Tk):
         Initialisation de la fenêtre graphique
         """
         tk.Tk.__init__(self)
+        #Dimensions de la fenêtre graphique
         self.height = 650
         self.width = 800
+        #Variables stockant la chaîne de caractères en temps réelle sur les textbars respectives
         self.genome_var=tk.StringVar()
         self.protein_var=tk.StringVar()
         #La fenêtre s'affiche avec les widgets 
         self.creer_widgets()
 
     def creer_widgets(self):
-
-    
-        #Création du canvas (fenêtre graphique à gauche)
+        #Création du canvas (zone graphique colorée sur la gauche)
         self.canv = tk.Canvas(self, bg="#CDFAF6", height=self.height,width=self.width)
         self.canv.pack(side=tk.LEFT)
 
@@ -69,7 +69,7 @@ class Appli(tk.Tk):
         self.os_set.current(0)
         self.submit_btn=tk.Button(self,text = 'Submit',bg="#CDFAF6", font=('arial',25),height= 2, width=10,command = self.submit)
 
-        #Fonction qui affiche des widgets définis au-dessus. On pack dans l'ordre d'affichage de haut en bas
+        #pack() permet de placer proprement les widgets en fonction des autres. On pack dans l'ordre d'affichage de haut en bas
         self.intro.pack(side=tk.TOP)
         self.genome.pack(side=tk.TOP)
         self.genome_entry.pack(side=tk.TOP)
