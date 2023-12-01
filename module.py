@@ -19,8 +19,6 @@ def get_list_os():
     list_os = ["linux","win","macosx"]
     return list_os
 
-def get_project_dir():
-    return '/comptes/r/rp103950/Prog/Projet/'
 
 #Fonctions partie 1 :
 #Fonction créeant un dataframe à partir du fichier d'annotation du génome spécifié:
@@ -40,7 +38,7 @@ def recup_data(genome):
 
     """
     ##On récupére en dataframe le fichier tsv.
-    dataframe = pd.read_csv(get_project_dir()+f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t')
+    dataframe = pd.read_csv(f'data/genomes/{genome}/annotation_{genome}.tsv', sep = '\t')
     dataframe.index = dataframe.index + 1
     return dataframe
 
