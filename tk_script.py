@@ -16,30 +16,47 @@ import sys
 from threading import Thread
 import module
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image
 
 
-#Classe ajoutée pour lancer l'analyse en parallèle du script
+#
 class StdoutRedirector(object):
+    """
+    Classe ajoutée pour pouvoir rediriger la sortie standard dans un widget de la fenêtre.
+    """
     def __init__(self, text_widget):
+        """
+        Description: 
+        Initialisation de la classe. On récupère en argument la Zone de texte dans lequel on veut afficher nos résultats d'analyse
+        Argument: 
+        text_widget: Widget Text
+        """
         self.text_widget = text_widget
- 
+
     def write(self, s):
+        """
+        Description:
+        Inscrit la chaîne de caractère s à la fin du widget en argument de la classe
+        Argument: 
+        s : string
+        """
         self.text_widget.insert('end', s)
         self.text_widget.see('end')
-    #fonction primordiale pour l'execution sur Windows uniquement
+        
     def flush(self):
+        """
+        Fonction primordiale pour l'execution sur Windows uniquement.
+        """
         pass
 
 class Appli(tk.Tk):
     """
-    Création de la classe Appli
-
-
+    Classe crée un environnement où l'on définit les attributs de notre objet: une fenêtre graphique.
     """
     def __init__(self):
         """
-        Initialisation de la fenêtre graphique
+        Description:
+        Initialisation de la classe. On définit les attributs initiaux de notre fenêtre graphique.
         """
         tk.Tk.__init__(self)
         #Dimensions de la fenêtre graphique
@@ -52,12 +69,13 @@ class Appli(tk.Tk):
         self.creer_widgets()
 
     def creer_widgets(self):
-        #Création du canvas (zone graphique colorée sur la gauche)
+        """
+        Description: Création et mise en place des différents widgets de la fenêtre graphique
+        """
+        #Définition du canvas (zone colorée à gauche)
         self.canv = tk.Canvas(self, bg="#CDFAF6", height=self.height,width=self.width)
         self.canv.pack(side=tk.LEFT)
 
-
-        
         #Définition des widgets demandant l'entrée des paramètres
         self.intro = tk.Label(self, text="Choix des paramètres:",font=('arial',25, 'bold'))
         self.genome = tk.Label(self, text="Genome",font=('arial',20, 'bold'))
@@ -82,14 +100,14 @@ class Appli(tk.Tk):
     def submit(self):
         """
         Description:
-        Bouton qui lance l'analyse de synténie. On s'assure de la validité des paramètres.
+        Bouton qui lance l'analyse de synténie et affiche les résultats. On s'assure de la validité des paramètres.
         """
-        #On stocke les variables entrées par l'utilisateur
+        #On stocke les variables soumises par l'utilisateur
         self.genome_use = self.genome_var.get()
         self.protein_use = self.protein_var.get()
         self.os_use = self.os_set.get()
 
-        #On s'assure que le génome est dans notre data et que la protéine est bien présente dans ce génome
+        #On s'assure de la validité des variables: génome est dans notre data et que la protéine est bien présente dans ce génome
         if self.genome_use in os.listdir('./data/genomes') and self.protein_use in module.recup_prot(self.genome_use):
             
             print("Genome chosen : " + self.genome_use)
