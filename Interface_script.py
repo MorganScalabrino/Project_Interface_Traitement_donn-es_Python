@@ -8,15 +8,13 @@ Created on Sun Nov 19 15:35:05 2023
 #'WP_000241659.1'
 #https://www.plus2net.com/python/tkinter-colors.php
 
-
-
 import tkinter as tk
 from tkinter import ttk
 import random as rd
 import os
 import sys
 from threading import Thread
-import module_vraidevrai
+import module
 import tkinter as tk
 from PIL import Image, ImageTk
 
@@ -51,13 +49,11 @@ class Appli(tk.Tk):
         #La fenêtre s'affiche avec les widgets 
         self.creer_widgets()
 
-    def text(
-
     def creer_widgets(self):
 
     
         #Création du canvas (fenêtre graphique à gauche)
-        self.canv = tk.Canvas(self, bg="cyan", height=self.height,width=self.width)
+        self.canv = tk.Canvas(self, bg="#CDFAF6", height=self.height,width=self.width)
         self.canv.pack(side=tk.LEFT)
 
 
@@ -69,9 +65,9 @@ class Appli(tk.Tk):
         self.os = tk.Label(self, text="OS",font=('arial',20, 'bold'))
         self.genome_entry = tk.Entry(self,textvariable = self.genome_var, bd=5,font=('arial',25,'normal'))
         self.protein_entry = tk.Entry(self,textvariable = self.protein_var, bd=5,font=('arial',25,'normal'))
-        self.os_set=ttk.Combobox(self,values=module_vraidevrai.get_list_os(),font=('arial',25,'normal'))
+        self.os_set=ttk.Combobox(self,values=module.get_list_os(),font=('arial',25,'normal'))
         self.os_set.current(0)
-        self.submit_btn=tk.Button(self,text = 'Submit',bg="#CAFF70", font=('arial',25),height= 2, width=10,command = self.submit)
+        self.submit_btn=tk.Button(self,text = 'Submit',bg="#CDFAF6", font=('arial',25),height= 2, width=10,command = self.submit)
 
         #Fonction qui affiche des widgets définis au-dessus. On pack dans l'ordre d'affichage de haut en bas
         self.intro.pack(side=tk.TOP)
@@ -94,14 +90,14 @@ class Appli(tk.Tk):
         self.os_use = self.os_set.get()
 
         #On s'assure que le génome est dans notre data et que la protéine est bien présente dans ce génome
-        if self.genome_use in os.listdir('./data/genomes') and self.protein_use in module_vraidevrai.recup_prot(self.genome_use):
+        if self.genome_use in os.listdir('./data/genomes') and self.protein_use in module.recup_prot(self.genome_use):
             
             print("Genome chosen : " + self.genome_use)
             print("Protein chosen : " + self.protein_use)
             print("OS chosen : " + self.os_use)
 
             #On créé une zone de texte où l'on affichera les résultats de notre analyse
-            self.textbox = tk.Text(self.canv, wrap='word',height=45,bg="#CAFF70") #char pour couper au carac, word pour couper au mot
+            self.textbox = tk.Text(self.canv, wrap='word',height=45,bg="#CDFAF6") #char pour couper au carac, word pour couper au mot
             self.textbox.pack()
             self.textbox.configure(font=("arial", 20, "italic"))
  
@@ -109,7 +105,7 @@ class Appli(tk.Tk):
             sys.stdout = StdoutRedirector(self.textbox)
 
             #On effectue l'analyse de synténie en parallèle de la fenêtre graphique
-            thread = Thread(target = module_vraidevrai.main(self.genome_use,self.protein_use,self.os_use))
+            thread = Thread(target = module.main(self.genome_use,self.protein_use,self.os_use))
             thread.start() 
 
 
