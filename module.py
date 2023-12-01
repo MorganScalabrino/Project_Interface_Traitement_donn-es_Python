@@ -12,10 +12,6 @@ from matplotlib.lines import Line2D
 from datetime import datetime
 from matplotlib.patches import Patch
 
-
-
-
-
 ##Fonctions de notre module:
 
 #Fonctions à adapter pour run le code
@@ -523,11 +519,10 @@ def main(genome,proteine,my_os_type):
     #Echelle.
     gv = GenomeViz(tick_style="axis")
 
-
     #On place chaque gène sur le génome.
     for elem in genome_visual:
         if elem['size'] >= 100000:
-            track = gv.add_feature_track(elem["name"], taille)
+            track = gv.add_feature_track(elem["name"], 200)
             track.add_feature(1000, 2500, 1, label = ("La distance entre les gènes est trop grande pour l'affichage"), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", labelsize = 14)
         else :
             name, size, cds_list = elem["name"], elem["size"], elem["cds_list"]
@@ -537,12 +532,11 @@ def main(genome,proteine,my_os_type):
                 start, end, strand, position, protein_id = cds
                 if position != (0,0):
                     if name == genome:
-                        track.add_feature(200, 200, 1, label = "* Génome de référence *", labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 14)
-                    track.add_exon_feature([(start,end)], strand, exon_labels = [protein_id], labelrotation = 0, labelha = "center", exon_label_kws = {"y": 0, "va": "center", "color": "white"})
-                    track.add_feature(start, end, strand, label = "begin : " + str(position[0]) + "       " + " end : " + str(position[1]), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", facecolor = color[idx-1],labelsize = 10)
+                        track.add_feature(0, 0, 1, label = "* Génome de référence *", labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 8)
+                    track.add_exon_feature([(start,end)], strand,exon_labels = [protein_id], labelrotation = 0, labelha = "center", exon_label_kws = {"y": 0, "va": "center", "color": "black"},labelsize = 9)
+                    track.add_feature(start, end, strand, label = str(position[0]) + "             " + str(position[1]), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", facecolor = color[idx-1],labelsize = 10)
 
     #On gère l'affichage des légendes.
-    
     #On trace la figure.
     fig = gv.plotfig()
 
