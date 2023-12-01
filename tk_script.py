@@ -10,7 +10,7 @@ import random as rd
 import os
 import sys
 from threading import Thread
-import module2
+import module
 import tkinter as tk
 from PIL import Image
 
@@ -88,7 +88,7 @@ class Appli(tk.Tk):
         self.os = tk.Label(self, text="OS",font=('arial',20, 'bold'))
         self.genome_entry = tk.Entry(self,textvariable = self.genome_var, bd=5,font=('arial',25,'normal'))
         self.protein_entry = tk.Entry(self,textvariable = self.protein_var, bd=5,font=('arial',25,'normal'))
-        self.os_set=ttk.Combobox(self,values=module2.get_list_os(),font=('arial',25,'normal'))
+        self.os_set=ttk.Combobox(self,values=module.get_list_os(),font=('arial',25,'normal'))
         self.os_set.current(0)
         self.submit_btn=tk.Button(self,text = 'Submit',bg="#CDFAF6", font=('arial',25),height= 2, width=10,command = self.submit)
 
@@ -113,7 +113,7 @@ class Appli(tk.Tk):
         self.os_use = self.os_set.get()
 
         #On s'assure de la validité des variables: génome est dans notre data et que la protéine est bien présente dans ce génome
-        if self.genome_use in os.listdir('./data/genomes') and self.protein_use in module2.recup_prot(self.genome_use):
+        if self.genome_use in os.listdir('./data/genomes') and self.protein_use in module.recup_prot(self.genome_use):
             
             print("Genome chosen : " + self.genome_use)
             print("Protein chosen : " + self.protein_use)
@@ -128,7 +128,7 @@ class Appli(tk.Tk):
             sys.stdout = StdoutRedirector(self.textbox)
 
             #On effectue l'analyse de synténie en parallèle de la fenêtre graphique
-            thread = Thread(target = module2.main(self.genome_use,self.protein_use,self.os_use))
+            thread = Thread(target = module.main(self.genome_use,self.protein_use,self.os_use))
             thread.start() 
 
 
@@ -137,8 +137,6 @@ class Appli(tk.Tk):
             image.show()
         else:
             self.canv.create_text((400,self.height/2),text="Au moins un des arguments est incorrect",font=('arial','25','bold'),fill='red')
-
-
 
 
 
