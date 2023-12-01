@@ -312,7 +312,7 @@ def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
 
     #Si la liste des positions est vide on a aucun des gènes sur le génome blasté.
     if list_position == []:
-        return {"name" : f"Les trois gènes sont absents du génome {genome}", "size" : 0, "cds_list" : ((0,0,0),(0,0,0),(0,0,0))}
+        return {"name" : f"Les trois gènes sont absents du génome {genome}", "size" : 0, "cds_list" : ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),""))}
 
     #Si on arrive ici alors la liste n'est pas nulle.
     #La fin de la zone de visualisation est le maximum de la liste des positions (avec une marge de 500pb).
