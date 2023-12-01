@@ -489,7 +489,8 @@ def main(genome,proteine,my_os_type):
     #On place chaque gène sur le génome.
     for elem in genome_visual:
         if elem['size'] >= 100000:
-            track = gv.add_feature_track(elem["name"], 200)
+            
+            track = gv.add_feature_track(elem["name"], 3000)
             track.add_feature(1000, 2500, 1, label = ("La distance entre les gènes est trop grande pour l'affichage"), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", labelsize = 14)
         else :
             name, size, cds_list = elem["name"], elem["size"], elem["cds_list"]
