@@ -373,6 +373,7 @@ def main(genome,proteine,my_os_type):
     from datetime import datetime
     starttime = datetime.now()
 
+    #Partie 0
     #Gérer le nombre d'arguments par utilisation fonction main
     var = ['',genome,proteine,my_os_type] 
 
@@ -391,7 +392,7 @@ def main(genome,proteine,my_os_type):
     if platform.system() != result_platform[my_os_type]:
         sys.exit(f"Fournir votre os, qui est : {platform.system()}")
 
-    
+    #Partie 1
     ##Si le nombre d'argument est bien de 2 et que le génome existe, 
     #alors on récupère les protéines présentes dans celui-ci et on
     #récupère les informations sur la protéine demandée.
@@ -401,17 +402,17 @@ def main(genome,proteine,my_os_type):
     else:
         sys.exit("Attention, le génome demandé n'est pas dans les 30 génomes donnés.")
         
-
+    #Partie 2
     #On récupère la séquence de notre protéine d'intérêt dans notre génome d'intérêt avec quelques informations.
     record = recup_seq(genome,proteine)
     
-    
+    #Partie 3
     #On récupère les 29 autres génomes de la liste :
     list_genome_autre = recup_genome("data/Ecoli_genomes_refseq.xlsx")
     list_genome_autre.remove(genome)
     
-    #Dictionnaire contenant les génomes et l'objet Alignement associé au Blastp.
-    dict_besthit_proteine = {}
+    #On crée un dictionnaire avec comme première valeur le génome de référence.
+    dict_proteine_info = {genome : recup_info_prot(genome,proteine)}
     
     for genom in list_genome_autre:
         #On blast sur l'un des 29 génomes.
@@ -420,25 +421,23 @@ def main(genome,proteine,my_os_type):
         #Meilleur résultat.
         hit = best_hit("result.xml")
 
-        dict_besthit_proteine[genom] = hit
-    
+        #On gère si jamais le blastp n'avait pas eu de hit.
+        if hit != "Pas de résultat":
+            list_proteine_info = recup_info_prot(genom,hit.hit_id[4:-1])
+            dict_proteine_info[genom] = list_proteine_info
+        else:
+            dict_proteine_info[genom] = "Pas de résultat"
 
-    
+    #Partie 4
     #On définit la protéine en amont et en aval.
     proteine_amont = amont_aval(genome,proteine)[0]
     proteine_aval = amont_aval(genome,proteine)[1]
-    
-    #Vérification.
-    print("La protéine en amont est", proteine_amont)
-    print("Les informations sur la protéine en amont sont :", recup_info_prot(genome,proteine_amont))
-    
-    print("La protéine en aval est", proteine_aval)
-    print("Les informations sur la protéine en amont sont :", recup_info_prot(genome,proteine_aval))
-    
+
+    #Partie 5
     #Pour la protéine en amont, même procédé qu'en partie 3:
     record_amont = recup_seq(genome,proteine_amont)
     
-    dict_besthit_proteine_amont = {}
+    dict_proteine_amont_info = {genome : recup_info_prot(genome,proteine_amont)}
     
     for genom in list_genome_autre:
         #On blast sur l'un des 29 génomes.
@@ -447,67 +446,35 @@ def main(genome,proteine,my_os_type):
         #Meilleur résultat.
         hit = best_hit("result.xml")
 
-        dict_besthit_proteine_amont[genom] = hit
+        #On gère si jamais le blastp n'avait pas eu de hit.
+        if hit != "Pas de résultat":
+            list_proteine_amont_info = recup_info_prot(genom,hit.hit_id[4:-1])
+            dict_proteine_amont_info[genom] = list_proteine_amont_info
+        else:
+            dict_proteine_amont_info[genom] = "Pas de résultat"
     
     
     #Pour la proteine en aval, même procédé qu'avant.
     record_aval = recup_seq(genome,proteine_aval)
     
-    dict_besthit_proteine_aval = {}
+    dict_proteine_aval_info = {genome : recup_info_prot(genome,proteine_aval)}
     
     for genom in list_genome_autre:
         #On blast sur l'un des 29 génomes.
         blastp(genom,record_aval,my_os_type)
 
-
         #Meilleur résultat.
         hit = best_hit("result.xml")
 
-        dict_besthit_proteine_aval[genom] = hit
-    
-    
-    #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine d'intérêt: 
-
-    #On crée un dictionnaire avec comme première valeur le génome de référence.
-    dict_proteine_info = {genome : recup_info_prot(genome,proteine)}
-    
-    for i in dict_besthit_proteine:
-        
         #On gère si jamais le blastp n'avait pas eu de hit.
-        if dict_besthit_proteine[i] != "Pas de résultat":
-            list_proteine_info = recup_info_prot(i,dict_besthit_proteine[i].hit_id[4:-1])
-            dict_proteine_info[i] = list_proteine_info
+        if hit != "Pas de résultat":
+            list_proteine_aval_info = recup_info_prot(genom,hit.hit_id[4:-1])
+            dict_proteine_aval_info[genom] = list_proteine_aval_info
         else:
-            dict_proteine_info[i] = "Pas de résultat"
-
-    #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en amont de celle d'intérêt: 
-    
-    dict_proteine_amont_info = {genome : recup_info_prot(genome,proteine_aval)}
-    
-    for i in dict_besthit_proteine_amont:
-        
-        #On gère si jamais le blastp n'avait pas eu de hit.
-        if dict_besthit_proteine_amont[i] != "Pas de résultat":
-            list_proteine_amont_info = recup_info_prot(i,dict_besthit_proteine_amont[i].hit_id[4:-1])
-            dict_proteine_amont_info[i] = list_proteine_amont_info
-        else:
-            dict_proteine_amont_info[i] = "Pas de résultat"
+            dict_proteine_aval_info[genom] = "Pas de résultat"
             
 
-    #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine en aval de celle d'intérêt: 
-    
-    dict_proteine_aval_info = {genome : recup_info_prot(genome,proteine_amont)}
-    
-    for i in dict_besthit_proteine_aval:
-
-        #On gère si jamais le blastp n'avait pas eu de hit.
-        if dict_besthit_proteine_aval[i] != "Pas de résultat":
-            list_proteine_aval_info = recup_info_prot(i,dict_besthit_proteine_aval[i].hit_id[4:-1])
-            dict_proteine_aval_info[i] = list_proteine_aval_info
-        else:
-            dict_proteine_aval_info[i] = "Pas de résultat"
-            
-    
+    #Partie 6
     #On crée les infos de visualtisation pour chaque génome.
     genome_visual=[]
     for genome_id in dict_proteine_info.keys() :
