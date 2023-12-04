@@ -671,6 +671,6 @@ if __name__ == '__main__':
 
 
     #On save la visualisation de la synténie.
-    fig.savefig("synt.png")
+    fig.savefig("synt1.png")
     fig2.savefig("synt2.png")
     fig3.savefig("synt3.png")
