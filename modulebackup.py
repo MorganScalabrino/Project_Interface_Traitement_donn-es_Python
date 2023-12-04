@@ -67,7 +67,7 @@ def recup_info_prot(genome,proteine):
             sys.exit("La protéine n'est pas contenu dans le génome donné.")
     except FileNotFoundError:
         print("Rentrez un argument correct svp.")
-    return list_prot_info
+    return list_prot_info.head(1)
 
 #Fonction récupérant la liste des protéines dans le génome spécifié:
 def recup_prot(genome):
@@ -307,7 +307,7 @@ def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
 
     #Si la liste des positions est vide on a aucun des gènes sur le génome blasté.
     if list_position == []:
-        return {"name" : f"Les trois gènes sont absents du génome {genome}", "size" : 0, "cds_list" : ((0,0,0),(0,0,0),(0,0,0))}
+        return {"name" : name, "size" : 0, "cds_list" : ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),""))}
 
     #Si on arrive ici alors la liste n'est pas nulle.
     #La fin de la zone de visualisation est le maximum de la liste des positions (avec une marge de 500pb).
@@ -320,7 +320,7 @@ def info_affichage_genome(genome, dict_aval, dict_amont, dict_centre):
     taille = fin - debut 
 
     #Si les protéines sont très éloignées alors nous n'avons pas trouvé de moyen de l'afficher, donc on dit que les protéines sont trop éloignées pour afficher.
-    if taille >= 100000:
+    if taille >= 20000:
         return {"name" : name, "size" : taille, "cds_list" : ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),""))}
 
     #On définit la taille de la protéine sur la zone de visualisation pour les 3 protéines.
@@ -481,7 +481,7 @@ if __name__ == '__main__':
     print(f"\nLes résultats de la synténie dans les 30 génomes sont désormais visible ! Pour cela reportez vous à la partie visualisation, une image est aussi accessible dans le dossier où vous avez lancer l'interface.")
     
     #On fait un dictionnaire avec des listes avec les informations sur les meilleurs hit du blast sur la protéine d'intérêt.
-
+    chars = 'ref|'
     #On crée un dictionnaire avec comme première valeur le génome de référence.
     dict_proteine_info = {genome : recup_info_prot(genome,proteine)}
     
@@ -489,7 +489,7 @@ if __name__ == '__main__':
         
         #On gère si jamais le blastp n'avait pas eu de hit.
         if dict_besthit_proteine[i] != "Pas de résultat":
-            list_proteine_info = recup_info_prot(i,dict_besthit_proteine[i].hit_id[4:-1])
+            list_proteine_info = recup_info_prot(i,dict_besthit_proteine[i].hit_id.translate(str.maketrans('', '', chars)))
             dict_proteine_info[i] = list_proteine_info
         else:
             dict_proteine_info[i] = "Pas de résultat"
@@ -502,7 +502,7 @@ if __name__ == '__main__':
         
         #On gère si jamais le blastp n'avait pas eu de hit.
         if dict_besthit_proteine_amont[i] != "Pas de résultat":
-            list_proteine_amont_info = recup_info_prot(i,dict_besthit_proteine_amont[i].hit_id[4:-1])
+            list_proteine_amont_info = recup_info_prot(i,dict_besthit_proteine_amont[i].hit_id.translate(str.maketrans('', '', chars)))
             dict_proteine_amont_info[i] = list_proteine_amont_info
         else:
             dict_proteine_amont_info[i] = "Pas de résultat"
@@ -515,7 +515,7 @@ if __name__ == '__main__':
 
         #On gère si jamais le blastp n'avait pas eu de hit.
         if dict_besthit_proteine_aval[i] != "Pas de résultat":
-            list_proteine_aval_info = recup_info_prot(i,dict_besthit_proteine_aval[i].hit_id[4:-1])
+            list_proteine_aval_info = recup_info_prot(i,dict_besthit_proteine_aval[i].hit_id.translate(str.maketrans('', '', chars)))
             dict_proteine_aval_info[i] = list_proteine_aval_info
         else:
             dict_proteine_aval_info[i] = "Pas de résultat"
@@ -526,16 +526,19 @@ if __name__ == '__main__':
         genome_visual.append(info_affichage_genome(genome_id,dict_proteine_aval_info,dict_proteine_amont_info,dict_proteine_info))
 
     #Couleur en fonction de la place du gène, pour observer l'ordre.
-    color = ["blue","red","green"]
+    color = ["turquoise","plum","coral"]
 
     #Echelle.
     gv = GenomeViz(tick_style="axis")
 
     #On place chaque gène sur le génome.
     for elem in genome_visual:
-        if elem['size'] >= 100000:
+        if elem['size'] >= 20000 :
             track = gv.add_feature_track(elem["name"], taille)
-            track.add_feature(1000, 2500, 1, label = ("La distance entre les gènes est trop grande pour l'affichage"), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", labelsize = 14)
+            track.add_feature(500, 1000, 1, label = ("La distance entre les gènes est trop grande pour l'affichage"), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", labelsize = 14)
+        elif elem['cds_list'] == ((0,0,0,(0,0),""),(0,0,0,(0,0),""),(0,0,0,(0,0),"")):
+            track = gv.add_feature_track(elem["name"],taille)
+            track.add_feature(500, 1000, 1, label = ("Les trois gènes sont absents du génome"), linewidth = 1, labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center", labelsize = 14)
         else :
             name, size, cds_list = elem["name"], elem["size"], elem["cds_list"]
             taille = size
@@ -555,9 +558,9 @@ if __name__ == '__main__':
 
     #On gère l'affichage des légendes.
     handles = [
-    Patch(color = "green", label = "Centre"),
-    Patch(color = "blue", label = "Amont"),
-    Patch(color = "red", label = "Aval"),
+    Patch(color = "coral", label = "Centre"),
+    Patch(color = "turquoise", label = "Amont"),
+    Patch(color = "plum", label = "Aval"),
     ]
     
     fig.legend(handles = handles, bbox_to_anchor = (1, 1))  
