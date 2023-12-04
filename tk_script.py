@@ -133,8 +133,12 @@ class Appli(tk.Tk):
 
 
             #On ouvre le fichier illustrant notre analyse de synténie 
-            image = Image.open('synt.png')
-            image.show()
+            image1 = Image.open('synt1.png')
+            image2 = Image.open('synt2.png')
+            image3 = Image.open('synt3.png')
+            image1.show()
+            image2.show()
+            image3.show()
         else:
             self.canv.create_text((400,self.height/2),text="Au moins un des arguments est incorrect",font=('arial','25','bold'),fill='red')
 
