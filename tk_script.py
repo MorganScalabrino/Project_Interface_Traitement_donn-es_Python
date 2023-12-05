@@ -68,8 +68,8 @@ class Appli(tk.Tk):
         #Messages de bienvenue
         self.canv.create_text((self.width/2,self.height/10),text="Bienvenue dans notre interface",font=('arial','30','bold'),fill='orange')
         self.canv.create_text((self.width/2,self.height/5),text="d'analyse de synténie",font=('arial','30','bold'),fill='orange')
-        self.canv.create_text((self.width/2,2.5*self.height/5),text="Veuillez renseignez soigneusement",font=('arial','20','bold'),fill='black')
-        self.canv.create_text((self.width/2,2.8*self.height/5),text="les paramètres de l'analyse",font=('arial','20','bold'),fill='black')
+        self.canv.create_text((self.width/2,2.2*self.height/5),text="Veuillez renseignez soigneusement",font=('arial','20','bold'),fill='black')
+        self.canv.create_text((self.width/2,2.5*self.height/5),text="les paramètres de l'analyse",font=('arial','20','bold'),fill='black')
         self.canv.create_text((3.5*self.width/5,9.5*self.height/10),text="par M.Scalabrino, J.Baldous, P.Rosset",font=('arial','15','bold'),fill='black')
 
     def creer_widgets(self):
@@ -140,7 +140,7 @@ class Appli(tk.Tk):
             image2.show()
             image3.show()
         else:
-            self.canv.create_text((400,self.height/2),text="Au moins un des arguments est incorrect",font=('arial','25','bold'),fill='red')
+            self.canv.create_text((400,self.3.5*height/5),text="Au moins un des arguments est incorrect",font=('arial','25','bold'),fill='red')
 
 
 
