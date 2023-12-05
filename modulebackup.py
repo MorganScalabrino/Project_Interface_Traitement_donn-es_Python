@@ -584,7 +584,8 @@ if __name__ == '__main__':
     
         fig2.legend(handles = handles, bbox_to_anchor = (1, 1))  
     else :
-        gv.add_feature_track(name2+"2eme",5000).add_feature(2500,2500,1,label="* Il n'y a aucune distance entre les gènes qui soit trop grande pour l'affichage *",labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 8)
+        track = gv2.add_feature_track(" ", 5000)
+        track.add_feature(2500,2500,1,label="* Il n'y a aucune distance entre les gènes qui soit trop grande pour l'affichage *",labelrotation = 0, labelvpos = "top", labelhpos = "center", labelha = "center",labelsize = 8)
         fig2=gv2.plotfig()
 
     k = 1
